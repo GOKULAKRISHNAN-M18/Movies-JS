@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Movie Search App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin: 20px 0;
+        }
+
+        .search-container {
+            margin: 20px;
+        }
+
+        input {
+            padding: 10px;
+            width: 250px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #e50914;
+            color: white;
+            cursor: pointer;
+        }
+
+        .movie-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .movie {
+            background: #222;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .movie img {
+            width: 100%;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎬 Movie Search App</h1>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search for movies...">
+        <button id="searchBtn">Search</button>
+    </div>
+
+    <div id="movieList" class="movie-list"></div>
+
+    <script>
+        const apiKey = "49c377f6"; // Replace with your OMDb API key
+        const searchBtn = document.getElementById("searchBtn");
+        const searchInput = document.getElementById("searchInput");
+        const movieList = document.getElementById("movieList");
+
+        searchBtn.addEventListener("click", fetchMovies);
+
+        async function fetchMovies() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                movieList.innerHTML = "<p>Please enter a movie name.</p>";
+                return;
+            }
+
+            const url = `https://www.omdbapi.com/?apikey=${apiKey}&s=${query}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.Response === "True") {
+                    displayMovies(data.Search);
+                } else {
+                    movieList.innerHTML = `<p>${data.Error}</p>`;
+                }
+            } catch (error) {
+                movieList.innerHTML = `<p>Something went wrong. Try again later.</p>`;
+            }
+        }
+
+        function displayMovies(movies) {
+            movieList.innerHTML = movies.map(movie => `
+        <div class="movie">
+          <img src="${movie.Poster !== "N/A" ? movie.Poster : 'https://via.placeholder.com/200'}" alt="${movie.Title}">
+          <h3>${movie.Title}</h3>
+          <p>${movie.Year}</p>
+          <p><strong>${movie.Type}</strong></p>
+        </div>
+      `).join("");
+        }
+    </script>
+</body>
+
+</html>
